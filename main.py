@@ -1,7 +1,3 @@
-import json
-import socket
-import time
-from datetime import datetime
 
 """
 CLIENT-PACKETS:
@@ -18,11 +14,11 @@ DISCONECT : Disconnets the Client from the Server.
 FAILEDDISCONNECT : Failed to either logout or to disconnect.
 
 """
-users = [
+import socket
+import time
 
-]
+users = []
 
-server_running = True
 # Create a UDP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -36,9 +32,6 @@ def sendToClient(response, address):
 
 
 def tryJoinPlayer(address):
-    """
-    @:param: returns 0 if fails
-    """
     global users
     currenttime = time.time()
     for user in users:
@@ -51,30 +44,15 @@ def tryJoinPlayer(address):
 
 
 def tryDisconnectPlayer(address):
-    """
-    @:param: returns 0 if fails
-    """
     global users
     t = 0
     for user in users:
         if user[0] == address:
-            users[t] = "--TOREMOVE--"
-            users.remove("--TOREMOVE--")
+            del users[t]
             sendToClient("DISCONNECT", address)
             return 1
         t += 1
     return 0
-
-
-def keepAliveCheck():
-    global users
-
-    t = 0
-    for user in users:
-        if not user[1] >= time.time() - 30:
-            tryDisconnectPlayer(users[t][0])
-            print("DISCONECTED", users[t][0])
-        t += 1
 
 
 while True:
@@ -82,10 +60,10 @@ while True:
     print("Starting listening...")
     data, address = sock.recvfrom(1024)
 
-    print("test")
+    print(f"Received data from {address}:", data.decode())
 
-    if data == "LOGIN":
+    if data.decode() == "LOGIN":
         tryJoinPlayer(address)
 
-    if data == "LOGOUT":
+    if data.decode() == "LOGOUT":
         tryDisconnectPlayer(address)
