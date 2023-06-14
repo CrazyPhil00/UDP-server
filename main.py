@@ -52,6 +52,7 @@ def tryDisconnectPlayer(address):
             sendToClient("DISCONNECT", address)
             return 1
         t += 1
+    sendToClient("FAILEDDISCONNECT", address)
     return 0
 
 
@@ -64,6 +65,8 @@ while True:
 
     if data.decode() == "LOGIN":
         tryJoinPlayer(address)
+        print("Trying to login")
 
     if data.decode() == "LOGOUT":
         tryDisconnectPlayer(address)
+        print("Trying to logout")
